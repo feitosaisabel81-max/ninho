@@ -1,0 +1,619 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Ninho | Moradia colaborativa</title>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f8f5;
+      color: #1f2a24;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #e5e8e3;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #2f7d4a;
+    }
+
+    .logo span {
+      color: #1f2a24;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      margin-left: 15px;
+      cursor: pointer;
+      font-size: 15px;
+      color: #37443c;
+    }
+
+    .hero {
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .hero-content {
+      max-width: 750px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7vw, 72px);
+      margin-bottom: 20px;
+      color: #234f32;
+    }
+
+    .hero p {
+      font-size: 20px;
+      line-height: 1.6;
+      color: #5b665f;
+      margin-bottom: 30px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 14px 24px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .primary {
+      background: #2f7d4a;
+      color: white;
+    }
+
+    .secondary {
+      background: white;
+      color: #2f7d4a;
+      border: 1px solid #2f7d4a;
+    }
+
+    .section {
+      padding: 60px 6%;
+      background: white;
+    }
+
+    .section h2 {
+      text-align: center;
+      margin-bottom: 35px;
+      font-size: 32px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: #f7f8f5;
+      padding: 25px;
+      border-radius: 16px;
+      border: 1px solid #e5e8e3;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      color: #2f7d4a;
+    }
+
+    .card p {
+      color: #667169;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      background: #1f2a24;
+      color: white;
+    }
+
+    /* MODAL */
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 100;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 30px;
+      border-radius: 18px;
+    }
+
+    .modal-box h2 {
+      margin-bottom: 20px;
+    }
+
+    .modal-box input {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 12px;
+      border: 1px solid #d5dbd6;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+
+    .modal-box button:not(.close) {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .close {
+      float: right;
+      border: none;
+      background: none;
+      font-size: 24px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- CABEÇALHO -->
+
+  <header>
+    <div class="logo">
+      Ninho<span>.</span>
+    </div>
+
+    <nav>
+      <button onclick="openLogin()">
+        Entrar
+      </button>
+
+      <button class="btn primary" onclick="openRegister()">
+        Criar conta
+      </button>
+    </nav>
+  </header>
+
+
+  <!-- PÁGINA PRINCIPAL -->
+
+  <main>
+
+    <section class="hero">
+
+      <div class="hero-content">
+
+        <h1>Encontre seu lugar.</h1>
+
+        <p>
+          O Ninho conecta pessoas que procuram moradia
+          com quem quer dividir um espaço, encontrar um
+          quarto ou compartilhar uma casa.
+        </p>
+
+        <div class="buttons">
+
+          <button
+            class="btn primary"
+            onclick="openRegister()">
+            Quero encontrar um lugar
+          </button>
+
+          <button
+            class="btn secondary"
+            onclick="openRegister()">
+            Quero anunciar
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- COMO FUNCIONA -->
+
+    <section class="section">
+
+      <h2>Como funciona?</h2>
+
+      <div class="cards">
+
+        <div class="card">
+          <h3>🏠 Encontre</h3>
+
+          <p>
+            Pesquise casas, apartamentos e quartos
+            disponíveis para morar.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <h3>🤝 Conecte-se</h3>
+
+          <p>
+            Conheça pessoas interessadas em dividir
+            uma moradia.
+          </p>
+        </div>
+
+
+        <div class="card">
+          <h3>💬 Converse</h3>
+
+          <p>
+            Use o chat interno do Ninho para conversar
+            com anunciantes e possíveis moradores.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- RODAPÉ -->
+
+  <footer>
+    © 2026 Ninho • Moradia colaborativa
+  </footer>
+
+
+  <!-- LOGIN -->
+
+  <div class="modal" id="loginModal">
+
+    <div class="modal-box">
+
+      <button class="close" onclick="closeModals">
+        ×
+      </button>
+
+      <h2>Entrar no Ninho</h2>
+
+      <input
+        type="email"
+        id="loginEmail"
+        placeholder="Seu e-mail"
+      >
+
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Sua senha"
+      >
+
+      <button
+        class="btn primary"
+        onclick="login()">
+        Entrar
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- CADASTRO -->
+
+  <div class="modal" id="registerModal">
+
+    <div class="modal-box">
+
+      <button class="close" onclick="closeModals()">
+        ×
+      </button>
+
+      <h2>Criar conta</h2>
+
+      <input
+        type="text"
+        id="registerName"
+        placeholder="Seu nome"
+      >
+
+      <input
+        type="email"
+        id="registerEmail"
+        placeholder="Seu e-mail"
+      >
+
+      <input
+        type="password"
+        id="registerPassword"
+        placeholder="Crie uma senha"
+      >
+
+      <button
+        class="btn primary"
+        onclick="register()">
+        Criar minha conta
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    /* ==============================
+       SUPABASE
+       ============================== */
+
+    const SUPABASE_URL =
+      "https://ykyhfjpmziskyeaitnmy.supabase.co";
+
+    const SUPABASE_KEY =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlreWhmanBtemlza3llYWl0bm15Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0Mzk0MjIsImV4cCI6MjEwNDAxNTQyMn0.nyg6P4JAmk8jiJFnkQ2qoMBjGfs7REhn9iMEHK2wbBE";
+
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+
+    /* ==============================
+       MODAIS
+       ============================== */
+
+    function openLogin() {
+
+      document
+        .getElementById("loginModal")
+        .classList.add("active");
+
+    }
+
+
+    function openRegister() {
+
+      document
+        .getElementById("registerModal")
+        .classList.add("active");
+
+    }
+
+
+    function closeModals() {
+
+      document
+        .getElementById("loginModal")
+        .classList.remove("active");
+
+      document
+        .getElementById("registerModal")
+        .classList.remove("active");
+
+    }
+
+
+    /* ==============================
+       CADASTRO
+       ============================== */
+
+    async function register() {
+
+      const name =
+        document
+          .getElementById("registerName")
+          .value
+          .trim();
+
+
+      const email =
+        document
+          .getElementById("registerEmail")
+          .value
+          .trim();
+
+
+      const password =
+        document
+          .getElementById("registerPassword")
+          .value;
+
+
+      if (!name || !email || !password) {
+
+        alert("Preencha todos os campos.");
+
+        return;
+
+      }
+
+
+      if (password.length < 6) {
+
+        alert(
+          "A senha precisa ter pelo menos 6 caracteres."
+        );
+
+        return;
+
+      }
+
+
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+
+          email: email,
+
+          password: password,
+
+          options: {
+
+            data: {
+              name: name
+            }
+
+          }
+
+        });
+
+
+      if (error) {
+
+        alert(error.message);
+
+        return;
+
+      }
+
+
+      alert(
+        "Conta criada! Verifique seu e-mail para confirmar o cadastro."
+      );
+
+      closeModals();
+
+    }
+
+
+    /* ==============================
+       LOGIN
+       ============================== */
+
+    async function login() {
+
+      const email =
+        document
+          .getElementById("loginEmail")
+          .value
+          .trim();
+
+
+      const password =
+        document
+          .getElementById("loginPassword")
+          .value;
+
+
+      if (!email || !password) {
+
+        alert(
+          "Preencha seu e-mail e sua senha."
+        );
+
+        return;
+
+      }
+
+
+      const { data, error } =
+        await supabaseClient.auth.signInWithPassword({
+
+          email: email,
+
+          password: password
+
+        });
+
+
+      if (error) {
+
+        alert(error.message);
+
+        return;
+
+      }
+
+
+      alert(
+        "Login realizado com sucesso! 🏠"
+      );
+
+      closeModals();
+
+      console.log(
+        "Usuário conectado:",
+        data.user
+      );
+
+    }
+
+
+    /* ==============================
+       VERIFICAR USUÁRIO
+       ============================== */
+
+    async function checkUser() {
+
+      const {
+        data: { user }
+      } = await supabaseClient.auth.getUser();
+
+
+      if (user) {
+
+        console.log(
+          "Usuário conectado:",
+          user.email
+        );
+
+      }
+
+    }
+
+
+    checkUser();
+
+  </script>
+
+</body>
+</html>
+```
